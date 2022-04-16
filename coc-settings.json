@@ -1,9 +1,0 @@
-{
-  "languageserver": {
-    "rust": {
-      "command": "ra_lsp_server",
-      "trace.server": "verbose",
-      "filetypes": ["rs"]
-    }
-  }
-}
