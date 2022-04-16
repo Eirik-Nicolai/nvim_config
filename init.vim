@@ -1,6 +1,6 @@
 set wildmenu
 set wildmode=longest:full,full  " get bash-like tab completions
-set cc=120                   " set an 80 column border for good coding style
+"set cc=120                   " set an 80 column border for good coding style
 filetype plugin indent on   " allows auto-indenting depending on file type
 set tabstop=4               " number of columns occupied by a tab character
 set shiftwidth=4            " width for autoindents
@@ -8,6 +8,14 @@ set softtabstop=4           " see multiple spaces as tabstops so <BS> does the r
 set number
 set mouse=a
 set undofile
+set cursorline
+set splitright
+
+autocmd VimEnter :set laststatus 3<CR>
+autocmd VimEnter :hi CursorLine cterm=None guifg=#5c6773<CR>
+autocmd VimEnter :hi VertSplit cterm=None guifg=#5c6773<CR>
+
+set fillchars+=vert:\|
 
 call plug#begin('~/AppData/Local/nvim/plugged')
 
@@ -29,9 +37,9 @@ call plug#begin('~/AppData/Local/nvim/plugged')
  Plug 'hrsh7th/cmp-path'
  Plug 'hrsh7th/cmp-cmdline'
  Plug 'hrsh7th/nvim-cmp'
- Plug 'dcampos/nvim-snippy'
- Plug 'dcampos/cmp-snippy'
- " -- alternative
+ Plug 'hrsh7th/vim-vsnip'
+ Plug 'hrsh7th/vim-vsnip-integ'
+ " -- extra IDE functionality (go to def, etc.)
  Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
  " -- bracket pair
@@ -44,8 +52,9 @@ call plug#begin('~/AppData/Local/nvim/plugged')
  Plug 'nvim-telescope/telescope-fzy-native.nvim'
  Plug 'BurntSushi/ripgrep'
 
- " -- nvim line prettifier
+" -- nvim line prettifier
  Plug 'nvim-lualine/lualine.nvim'
+
  " -- file tree
  Plug 'kyazdani42/nvim-tree.lua'
 
@@ -53,7 +62,8 @@ call plug#begin('~/AppData/Local/nvim/plugged')
  Plug 'prettier/vim-prettier'
  Plug 'preservim/nerdcommenter'
  Plug 'mhinz/vim-startify'
-" -- colour themes
+
+ " -- colour themes 
  Plug 'dracula/vim', { 'as': 'dracula' }
  Plug 'ayu-theme/ayu-vim'
  " -- web icons
@@ -118,10 +128,12 @@ EOF
 
 " ------------- BRACKETS PAIRING ------------------
 
+let g:AutoPairs = {'(':')', '[':']', '{':'}','<':'>',"'":"'",'"':'"', "`":"`", '```':'```', '"""':'"""', "'''":"'''"}
 let g:AutoPairsShortcutFastWrap = '<A-p><A-p>'
 let g:AutoPairsShortcutToggle = '<A-p><A-t>'
-let g:AutoPairsFlyMode = 1
+let g:AutoPairsFlyMode = 0
 
+let g:AutoPairsShortcutFastWrap = '<S-q><S-q>'
 
 " --------------- OVERRIDE KEYMAPPINGS ----------------
 " -- copy-paste and line manipulation stuff
@@ -171,7 +183,7 @@ require('lualine').setup {
     section_separators = { left = '', right = ''},
     disabled_filetypes = {},
     always_divide_middle = true,
-    globalstatus = false,
+    globalstatus = true,
   },
   sections = {
     lualine_a = {'mode'},
@@ -298,8 +310,10 @@ map <silent> <S-F12> :call CocActionAsync('jumpDefinition')<CR>
 " ----- TOP TABBING OF BUFFERS ----
 
 " new/del tab
-nnoremap <silent>    <C-t> :enew<CR>
-nnoremap <silent>    <C-w> :bdelete<CR>
+map <silent>    <C-t><C-t> :enew<CR>
+map <silent>    <C-t><C-h> :new<CR>
+map <silent>    <C-t><C-v> :vnew<CR>
+map <silent>    <C-w> :bdelete<CR>
 " Move to previous/next
 nnoremap <silent>    <A-,> :BufferPrevious<CR>
 nnoremap <silent>    <A-.> :BufferNext<CR>
@@ -405,9 +419,9 @@ lua <<EOF
     snippet = {
       -- REQUIRED - you must specify a snippet engine
       expand = function(args)
-        -- vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+        vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
         -- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
-        require('snippy').expand_snippet(args.body) -- For `snippy` users.
+        -- require('snippy').expand_snippet(args.body) -- For `snippy` users.
         -- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
       end,
     },
@@ -424,10 +438,10 @@ lua <<EOF
     }),
     sources = cmp.config.sources({
       { name = 'nvim_lsp' },
-     --  { name = 'vsnip' }, -- For vsnip users.
+      { name = 'vsnip' }, -- For vsnip users.
       -- { name = 'luasnip' }, -- For luasnip users.
       -- { name = 'ultisnips' }, -- For ultisnips users.
-      { name = 'snippy' }, -- For snippy users.
+      -- { name = 'snippy' }, -- For snippy users.
     }, {
       { name = 'buffer' },
     })
