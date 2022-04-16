@@ -11,8 +11,8 @@ set undofile
 
 call plug#begin('~/AppData/Local/nvim/plugged')
 
-Plug 'romgrk/barbar.nvim'
- 
+ Plug 'romgrk/barbar.nvim'
+
  " -- syntax highlight and linting
  Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
  
@@ -36,6 +36,7 @@ Plug 'romgrk/barbar.nvim'
 
  " -- bracket pair
  Plug 'jiangmiao/auto-pairs'
+
  " -- find in file stuff
  Plug 'nvim-telescope/telescope.nvim'
  Plug 'nvim-lua/plenary.nvim'
@@ -61,9 +62,7 @@ Plug 'romgrk/barbar.nvim'
 
 call plug#end()
 
-" ------------ MISC STUFF ------------
-
-" -- find-in-file functionality
+" ----------- FIND IN FILES --------------------
 " find files in curr dir
 nnoremap <C-f><C-p> <cmd>Telescope find_files<cr>
 " find hovered string in curr dir
@@ -95,6 +94,8 @@ colorscheme ayu
 
 lua <<EOF
 vim.opt.list = true
+vim.opt.termguicolors = true
+vim.cmd [[highlight IndentBlanklineIndent1 guifg=#171b24 gui=nocombine]]
 
 require("indent_blankline").setup {
     show_end_of_line = false,
@@ -105,9 +106,24 @@ require("indent_blankline").setup {
 	space_char_blankline = " ",
     show_current_context = true,
     show_current_context_start = true,
+	char_highlight_list = {
+        "IndentBlanklineIndent1",
+	},
+
+	indent_blankline_show_trailing_blankline_indent = false,
+	indent_blankline_space_char_blankline_highlight_list = {Error, "Function"},
+	indent_blankline_use_treesitter = true,
 }
 EOF
 
+" ------------- BRACKETS PAIRING ------------------
+
+let g:AutoPairsShortcutFastWrap = '<A-p><A-p>'
+let g:AutoPairsShortcutToggle = '<A-p><A-t>'
+let g:AutoPairsFlyMode = 1
+
+
+" --------------- OVERRIDE KEYMAPPINGS ----------------
 " -- copy-paste and line manipulation stuff
 " -- <F2> is copy, <F3> is cut, <F3> is paste
 map <F2> "+yi
@@ -125,7 +141,8 @@ vnoremap <C-Up>		:m '<-2<CR>gv=gv
 
 autocmd BufReadPost * silent! normal! g`"zv
 
-" --nerdcommenter
+
+" ---------- CODE COMMENTING FEATURES ------------
 filetype plugin on
 " Create default mappings
 let g:NERDCreateDefaultMappings = 1
@@ -219,13 +236,17 @@ require('lualine').setup {
 }
 EOF
 
-" -- tree-like symbol view of curr project
+
+
+
+
+" --------------- SYMBOLS VIEW ----------------
 lua <<EOF
 	vim.g.symbols_outline = {
 	    highlight_hovered_item = true
 	}
 EOF
-map <S-F12> :SymbolsOutline
+map <silent> <S-F12> :SymbolsOutline
 
 lua <<EOF
 	require'nvim-web-devicons'.setup {
@@ -276,6 +297,7 @@ map <silent> <S-F12> :call CocActionAsync('jumpDefinition')<CR>
 
 " ----- TOP TABBING OF BUFFERS ----
 
+" new/del tab
 nnoremap <silent>    <C-t> :enew<CR>
 nnoremap <silent>    <C-w> :bdelete<CR>
 " Move to previous/next
