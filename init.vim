@@ -11,13 +11,21 @@ set undofile
 set cursorline
 set splitright
 
-autocmd VimEnter :set laststatus 3<CR>
-autocmd VimEnter :hi VertSplit cterm=None guifg=#5c6773<CR>
-autocmd VimEnter :hi CursorLine cterm=None guifg=#5c6773<CR>
+autocmd VimEnter * set laststatus=3
+autocmd VimEnter * hi CursorLine cterm=None guibg=#5c6773
+autocmd VimEnter * hi VertSplit cterm=None guibg=#5c6773
+
 
 set fillchars+=vert:\|
 
-call plug#begin('~/AppData/Local/nvim/plugged')
+
+if has('win32')
+	let os_path ='~/AppData/Local/nvim/plugged' 
+elseif has('win32')
+	let os_path = '~/.config/nvim'
+endif
+
+call plug#begin(os_path)
 
  Plug 'romgrk/barbar.nvim'
 
