@@ -41,7 +41,24 @@ call plug#begin('~/AppData/Local/nvim/plugged')
  " -- TODO debugging
  "Plug 'mfussenegger/nvim-dap'
 
- " -- bracket pair
+ " -- cmd completion
+ if has('nvim')
+  function! UpdateRemotePlugins(...)
+    " Needed to refresh runtime files
+    let &rtp=&rtp
+    UpdateRemotePlugins
+  endfunction
+
+  Plug 'gelguy/wilder.nvim', { 'do': function('UpdateRemotePlugins') }
+else
+  Plug 'gelguy/wilder.nvim'
+
+  " To use Python remote plugin features in Vim, can be skipped
+  Plug 'roxma/nvim-yarp'
+  Plug 'roxma/vim-hug-neovim-rpc'
+endif
+
+ "-- bracket pair
  Plug 'jiangmiao/auto-pairs'
 
  " -- find in file stuff
@@ -128,11 +145,14 @@ EOF
 " ------------- BRACKETS PAIRING ------------------
 
 let g:AutoPairs = {'(':')', '[':']', '{':'}','<':'>',"'":"'",'"':'"', "`":"`", '```':'```', '"""':'"""', "'''":"'''"}
-let g:AutoPairsShortcutFastWrap = '<A-p><A-p>'
-let g:AutoPairsShortcutToggle = '<A-p><A-t>'
+let g:AutoPairsShortcutFastWrap = '<C-q><C-q>'
+let g:AutoPairsShortcutToggle = '<C-q><C-t>'
 let g:AutoPairsFlyMode = 0
 
-let g:AutoPairsShortcutFastWrap = '<S-q><S-q>'
+" ----------------- CMD COMPLETION ------------------
+" Key bindings can be changed, see below
+call wilder#setup({'modes': [':', '/', '?']})
+
 
 " --------------- OVERRIDE KEYMAPPINGS ----------------
 " -- copy-paste and line manipulation stuff
@@ -149,6 +169,8 @@ inoremap <C-Down>	<Esc>:m .+1<CR>==gi
 inoremap <C-Up>		<Esc>:m .-2<CR>==gi
 vnoremap <C-Down>	:m '>+1<CR>gv=gv
 vnoremap <C-Up>		:m '<-2<CR>gv=gv
+
+
 
 autocmd BufReadPost * silent! normal! g`"zv
 
@@ -494,8 +516,13 @@ map <silent>    <C-t><C-h> :new<CR>
 map <silent>    <C-t><C-v> :vnew<CR>
 map <silent>    <C-w> :bdelete<CR>
 " Move to previous/next
-nnoremap <silent>    <A-,> :BufferPrevious<CR>
-nnoremap <silent>    <A-.> :BufferNext<CR>
+nnoremap <silent>    <A-h> :BufferPrevious<CR>
+nnoremap <silent>    <A-l> :BufferNext<CR>
+" Move to splits
+map <silent>    <C-h> :wincmd h<CR>
+map <silent>    <C-l> :wincmd l<CR>
+map <silent>    <C-j> :wincmd j<CR>
+map <silent>    <C-k> :wincmd k<CR>
 " Re-order to previous/next
 nnoremap <silent>    <A-<> :BufferMovePrevious<CR>
 nnoremap <silent>    <A->> :BufferMoveNext<CR>
@@ -527,10 +554,6 @@ nnoremap <silent> <Space>bb :BufferOrderByBufferNumber<CR>
 nnoremap <silent> <Space>bd :BufferOrderByDirectory<CR>
 nnoremap <silent> <Space>bl :BufferOrderByLanguage<CR>
 nnoremap <silent> <Space>bw :BufferOrderByWindowNumber<CR>
-
-" Other:
-" :BarbarEnable - enables barbar (enabled by default)
-" :BarbarDisable - very bad command, should never be used
 
 " ---------- FILE TREE STUFF ------------------
 
